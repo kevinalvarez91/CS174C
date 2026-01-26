@@ -422,26 +422,31 @@ export class Assign_one_hermite extends Assign_one_hermite_base
 
       // get_arc_length
 if (w[0] === "get_arc_length") {
-  // Optional: allow get_arc_length <samples_per_segment> <rows>
-  let sps = 60;
-  let rows = 25; // "reasonable number of rows"
+  // Usage: get_arc_length [samples_per_segment] [rows]
+  console.log("GET ARC LENGTH"); 
+  let sps  = 60;
+  let rows = 25;
 
   if (w.length >= 2) {
     sps = parseInt(w[1], 10);
-    if (!Number.isFinite(sps) || sps < 2) throw new Error("get_arc_length: samples_per_segment must be int >= 2");
+    if (!Number.isFinite(sps) || sps < 2)
+      throw new Error("get_arc_length: samples_per_segment must be int >= 2");
   }
   if (w.length >= 3) {
     rows = parseInt(w[2], 10);
-    if (!Number.isFinite(rows) || rows < 2) throw new Error("get_arc_length: rows must be int >= 2");
+    if (!Number.isFinite(rows) || rows < 2)
+      throw new Error("get_arc_length: rows must be int >= 2");
   }
-  if (w.length > 3) throw new Error("Usage: get_arc_length [samples_per_segment] [rows]");
+  if (w.length > 3)
+    throw new Error("Usage: get_arc_length [samples_per_segment] [rows]");
 
   const { total, table } = this.spline.arc_length_table(sps);
 
-  // Downsample table to 'rows' lines (always include first + last)
+  // Build output (reasonable number of rows)
   const out = [];
-  out.push(`Arc length (piecewise linear approx) ≈ ${total.toFixed(6)}`);
-  out.push(`Lookup table: s -> t  (samples/seg=${sps}, rows=${rows})`);
+  out.push(`Arc length parameterization (piecewise linear approx)`);
+  out.push(`Arc length ≈ ${total.toFixed(6)}`);
+  out.push(`Lookup table (s -> t):`);
   out.push(`s\t\tt`);
 
   const N = table.length;
@@ -452,8 +457,10 @@ if (w[0] === "get_arc_length") {
   }
 
   document.getElementById("output").value = out.join("\n");
-  return; // IMPORTANT: don't fall through to "Parsed OK..."
+  applied++;         // count it as a command
+  return;            // IMPORTANT: stop; don't print "Parsed OK..."
 }
+
 
       throw new Error(`Unknown/invalid command: "${line}"`);
     }
@@ -534,40 +541,53 @@ preset_straight() {
 }
 
 preset_circle() {
+  console.log("CIRCLE"); // for debugging
   this.spline.clear();
 
   const y = 1.0;
   const R = 3.0;
-  const N = 8;                    // 8 segments around the circle
+
+  // More segments => looks like a circle
+  const N = 80;
+
   const dtheta = (2 * Math.PI) / N;
-  const m_mag = 4 * Math.tan(dtheta / 4) * R; // Hermite tangent magnitude for circular arc approx
+
+  // This m_mag is the correct Hermite (derivative) magnitude for one segment in local u∈[0,1]
+  const m_mag_local = 4 * Math.tan(dtheta / 4) * R;
+
+  // IMPORTANT: your evaluate() multiplies tangents by (1/segments),
+  // so store tangents scaled up by segments so that after scaling you get m_mag_local.
+  const segments = N;                 // because we will add N+1 points (closed), so segments = (N+1)-1 = N
+  const store_scale = segments;
 
   for (let k = 0; k < N; k++) {
     const theta = k * dtheta;
+
     const x = R * Math.cos(theta);
     const z = R * Math.sin(theta);
 
-    // Tangent direction (derivative w.r.t. theta): (-sin, 0, cos)
-    const tx = -Math.sin(theta) * m_mag;
-    const tz =  Math.cos(theta) * m_mag;
+    // unit tangent direction on circle in xz-plane: (-sin, 0, cos)
+    const tx = -Math.sin(theta) * m_mag_local * store_scale;
+    const tz =  Math.cos(theta) * m_mag_local * store_scale;
 
     this.spline.add_point(vec3(x, y, z), vec3(tx, 0, tz));
   }
 
-  // Close the loop by repeating the first point as the last control point:
-  // (This makes the last segment connect back to start.)
+  // close loop (repeat first point + tangent)
   {
     const theta = 0;
     const x = R * Math.cos(theta);
     const z = R * Math.sin(theta);
-    const tx = -Math.sin(theta) * m_mag;
-    const tz =  Math.cos(theta) * m_mag;
+
+    const tx = -Math.sin(theta) * m_mag_local * store_scale;
+    const tz =  Math.cos(theta) * m_mag_local * store_scale;
+
     this.spline.add_point(vec3(x, y, z), vec3(tx, 0, tz));
   }
 
-  // Immediately draw
   this.update_scene();
 }
+
 
 
 
