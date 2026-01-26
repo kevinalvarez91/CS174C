@@ -8,9 +8,9 @@ This file contains all required functionality for the assignment. Below are the 
 
 ## Core spline implementation
 - Implemented a full **cubic Hermite spline** in `class HermiteSpline`.
-- Global parameterization `t ∈ [0,1]` is handled in `evaluate(t)` by:
+- Global parameterization `t := [0,1]` is handled in `evaluate(t)` by:
   - mapping `t` to a segment index
-  - converting to local `u ∈ [0,1]`
+  - converting to local `u := [0,1]`
   - scaling tangents correctly so interpolation is consistent across segments
 
 See `HermiteSpline.evaluate(t)`
@@ -40,7 +40,7 @@ See `parse_commands()`
 
 ## Arc length parameterization
 - Arc length is approximated using piecewise linear sampling.
-- A lookup table mapping `s → t` is generated and printed.
+- A lookup table mapping `s -> t` is generated and printed.
 - Used only for reporting (not for motion).
 
 See `HermiteSpline.arc_length_table()`  
