@@ -61,7 +61,7 @@ evaluate(t) {
 
 
   // IMPORTANT: tangents must be scaled because u = segments * t
-  // If tangents are given in "global t" units, convert to "local u" units.
+  // if tangents are given in "global t" units, convert to "local u" units.
   const tangent_scale = 1 / segments;
 
   const p0 = this.points[i];
@@ -69,7 +69,7 @@ evaluate(t) {
   const m0 = this.tangents[i].times(tangent_scale);
   const m1 = this.tangents[i + 1].times(tangent_scale);
 
-  // Cubic Hermite basis
+  // just the standard cubic hermanitan basis
   const u2 = u * u, u3 = u2 * u;
   const h00 =  2*u3 - 3*u2 + 1;
   const h10 =      u3 - 2*u2 + u;
@@ -421,45 +421,45 @@ export class Assign_one_hermite extends Assign_one_hermite_base
       }
 
       // get_arc_length
-if (w[0] === "get_arc_length") {
-  // Usage: get_arc_length [samples_per_segment] [rows]
-  console.log("GET ARC LENGTH"); 
-  let sps  = 60;
-  let rows = 25;
+      if (w[0] === "get_arc_length") {
+        // Usage: get_arc_length [samples_per_segment] [rows]
+        console.log("GET ARC LENGTH"); 
+        let sps  = 60;
+        let rows = 25;
 
-  if (w.length >= 2) {
-    sps = parseInt(w[1], 10);
-    if (!Number.isFinite(sps) || sps < 2)
-      throw new Error("get_arc_length: samples_per_segment must be int >= 2");
-  }
-  if (w.length >= 3) {
-    rows = parseInt(w[2], 10);
-    if (!Number.isFinite(rows) || rows < 2)
-      throw new Error("get_arc_length: rows must be int >= 2");
-  }
-  if (w.length > 3)
-    throw new Error("Usage: get_arc_length [samples_per_segment] [rows]");
+        if (w.length >= 2) {
+          sps = parseInt(w[1], 10);
+          if (!Number.isFinite(sps) || sps < 2)
+            throw new Error("get_arc_length: samples_per_segment must be int >= 2");
+        }
+        if (w.length >= 3) {
+          rows = parseInt(w[2], 10);
+          if (!Number.isFinite(rows) || rows < 2)
+            throw new Error("get_arc_length: rows must be int >= 2");
+        }
+        if (w.length > 3)
+          throw new Error("Usage: get_arc_length [samples_per_segment] [rows]");
 
-  const { total, table } = this.spline.arc_length_table(sps);
+        const { total, table } = this.spline.arc_length_table(sps);
 
-  // Build output (reasonable number of rows)
-  const out = [];
-  out.push(`Arc length parameterization (piecewise linear approx)`);
-  out.push(`Arc length ≈ ${total.toFixed(6)}`);
-  out.push(`Lookup table (s -> t):`);
-  out.push(`s\t\tt`);
+        // Build output (reasonable number of rows) according to TA, we don't want to overload the machines
+        const out = [];
+        out.push(`Arc length parameterization (piecewise linear approx)`);
+        out.push(`Arc length ≈ ${total.toFixed(6)}`);
+        out.push(`Lookup table (s -> t):`);
+        out.push(`s\t\tt`);
 
-  const N = table.length;
-  for (let r = 0; r < rows; r++) {
-    const idx = Math.round(r * (N - 1) / (rows - 1));
-    const { s, t } = table[idx];
-    out.push(`${s.toFixed(6)}\t${t.toFixed(6)}`);
-  }
+        const N = table.length;
+        for (let r = 0; r < rows; r++) {
+          const idx = Math.round(r * (N - 1) / (rows - 1));
+          const { s, t } = table[idx];
+          out.push(`${s.toFixed(6)}\t${t.toFixed(6)}`);
+        }
 
-  document.getElementById("output").value = out.join("\n");
-  applied++;         // count it as a command
-  return;            // IMPORTANT: stop; don't print "Parsed OK..."
-}
+        document.getElementById("output").value = out.join("\n");
+        applied++;         // count it as a command
+        return;            // dont print parsed ok
+      }
 
 
       throw new Error(`Unknown/invalid command: "${line}"`);
@@ -520,6 +520,7 @@ export_spline() {
 
 preset_straight() {
   // 4 control points in a straight line, equally spaced
+  console.log("LINE"); 
   this.spline.clear();
 
   const y = 1.0;
@@ -587,9 +588,5 @@ preset_circle() {
 
   this.update_scene();
 }
-
-
-
-
 
 }
