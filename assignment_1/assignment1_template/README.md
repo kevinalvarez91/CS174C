@@ -2,7 +2,7 @@
 
 **File:** `assign_one_hermite.js`
 
-This file contains all required functionality for the assignment. Below are the **non-obvious parts** and where to find them.
+This file contains all required functionality for the assignment.
 
 ---
 
@@ -71,7 +71,8 @@ See `preset_straight()` and `preset_circle()`
 To avoid unintended interpolation artifacts:
 > **Please reload the page before testing a new shape or input set.**
 
-Because the spline state persists across button presses, mixing presets and manual commands without reloading can lead to confusing intermediate results. A fresh reload ensures clean, expected behavior.
+Because the spline state persists across button presses, mixing presets and manual commands without reloading can lead to confusing intermediate results. A fresh reload ensures clean, expected behavior. 
+**Verified with the TA that this behavior is okay to submit.**
 
 ---
 
@@ -80,3 +81,24 @@ Because the spline state persists across button presses, mixing presets and manu
 2. Click **Straight!** or **Circle!**
 3. Click **Draw**
 4. **Or** Export -> Reload -> Load -> Draw
+
+
+## Test cases (given by TA)
+
+### Test Case 1
+```
+add point  0.0 4.0 0.0   -12.0  -3.0   12.0
+add point  0.0 3.0 4.0     9.0  -3.0    9.0
+add point  3.0 2.0 4.0     9.0  -3.0   -9.0
+add point  3.0 1.0 0.0   -12.0  -3.0  -12.0
+```
+
+### Test Case 2
+```
+add point  0.0 5.0 0.0   -20.0  0.0   20.0
+add point  0.0 5.0 5.0    20.0  0.0   20.0
+add point  5.0 5.0 5.0    20.0  0.0  -20.0
+add point  5.0 5.0 0.0   -20.0  0.0  -20.0
+add point  0.0 5.0 0.0   -20.0  0.0   20.0
+get_arc_length
+```
