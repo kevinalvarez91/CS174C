@@ -46,7 +46,7 @@ evaluate(t) {
   if (n === 0) return vec3(0, 0, 0);
   if (n === 1) return this.points[0];
 
-  // clamp global t
+  // clamp global t to be between 0 & 1
   t = Math.max(0, Math.min(1, t));
 
   const segments = n - 1;
@@ -57,10 +57,11 @@ evaluate(t) {
   if (i >= segments) i = segments - 1;
   const u = scaled - i;
 
+  // debugging
   if (Math.abs(t - 0.5) < 1e-6) console.log("segments", segments, "i", i, "u", u);
 
 
-  // IMPORTANT: tangents must be scaled because u = segments * t
+  // tangents must be scaled because u = segments * t
   // if tangents are given in "global t" units, convert to "local u" units.
   const tangent_scale = 1 / segments;
 
@@ -115,6 +116,7 @@ load_from_string(text) {
     if (lines.length === 0) throw new Error("load: empty input");
 
     const n = parseInt(lines[0]);
+
     if (!Number.isFinite(n) || n < 0) throw new Error("load: first line must be integer n");
     if (lines.length !== 1 + n) throw new Error(`load: expected ${n} data lines, got ${lines.length - 1}`);
 
@@ -177,13 +179,11 @@ class Polyline extends Shape {
 
   set_points(points) {
     this.arrays.position = points;
-    this.arrays.normal = points.map(_ => vec3(0, 1, 0)); // dummy normals
+    this.arrays.normal = points.map(_ => vec3(0, 1, 0)); // just init to something
     this.indices = [];
     for (let i = 0; i < points.length; i++) this.indices.push(i);
   }
 
-  // Many tiny-graphics builds support passing a draw mode string as 5th arg.
-  // If yours doesn't, tell me the error and I’ll adjust this to your exact version.
   draw(context, program_state, model_transform, material) {
     super.draw(context, program_state, model_transform, material, "LINE_STRIP");
   }
@@ -395,6 +395,7 @@ export class Assign_one_hermite extends Assign_one_hermite_base
 
       // add point x y z sx sy sz
       if (w[0] === "add" && w[1] === "point" && w.length === 8) {
+        console.log("[DEBUG] ADD POINT")
         const x = parseFloat(w[2]), y = parseFloat(w[3]), z = parseFloat(w[4]);
         const sx = parseFloat(w[5]), sy = parseFloat(w[6]), sz = parseFloat(w[7]);
         this.spline.add_point(vec3(x,y,z), vec3(sx,sy,sz));
@@ -404,6 +405,7 @@ export class Assign_one_hermite extends Assign_one_hermite_base
 
       // set point i x y z
       if (w[0] === "set" && w[1] === "point" && w.length === 6) {
+        console.log("[DEBUG] SET POINT"); 
         const i = parseInt(w[2], 10);
         const x = parseFloat(w[3]), y = parseFloat(w[4]), z = parseFloat(w[5]);
         this.spline.set_point(i, vec3(x,y,z));
@@ -413,6 +415,7 @@ export class Assign_one_hermite extends Assign_one_hermite_base
 
       // set tangent i sx sy sz
       if (w[0] === "set" && w[1] === "tangent" && w.length === 6) {
+        console.log("[DEBUG] SET TANGENT"); 
         const i = parseInt(w[2], 10);
         const sx = parseFloat(w[3]), sy = parseFloat(w[4]), sz = parseFloat(w[5]);
         this.spline.set_tangent(i, vec3(sx,sy,sz));
@@ -423,7 +426,7 @@ export class Assign_one_hermite extends Assign_one_hermite_base
       // get_arc_length
       if (w[0] === "get_arc_length") {
         // Usage: get_arc_length [samples_per_segment] [rows]
-        console.log("GET ARC LENGTH"); 
+        console.log("[DEBUG] GET ARC LENGTH"); 
         let sps  = 60;
         let rows = 25;
 
@@ -520,7 +523,7 @@ export_spline() {
 
 preset_straight() {
   // 4 control points in a straight line, equally spaced
-  console.log("LINE"); 
+  console.log("[DEBUG] LINE"); 
   this.spline.clear();
 
   const y = 1.0;
@@ -542,7 +545,7 @@ preset_straight() {
 }
 
 preset_circle() {
-  console.log("CIRCLE"); // for debugging
+  console.log("[DEBUG] CIRCLE"); // for debugging
   this.spline.clear();
 
   const y = 1.0;
@@ -553,11 +556,10 @@ preset_circle() {
 
   const dtheta = (2 * Math.PI) / N;
 
-  // This m_mag is the correct Hermite (derivative) magnitude for one segment in local u∈[0,1]
+  // This m_mag is the correct Hermite (derivative) magnitude for one segment
   const m_mag_local = 4 * Math.tan(dtheta / 4) * R;
 
-  // IMPORTANT: your evaluate() multiplies tangents by (1/segments),
-  // so store tangents scaled up by segments so that after scaling you get m_mag_local.
+  // store tangents scaled up by segments so that after scaling you get m_mag_local.
   const segments = N;                 // because we will add N+1 points (closed), so segments = (N+1)-1 = N
   const store_scale = segments;
 

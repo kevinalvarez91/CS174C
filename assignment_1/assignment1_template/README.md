@@ -1,4 +1,4 @@
-# Assignment 1 – Implementation Notes (Grader Guide)
+# Assignment 1 – Implementation Notes
 
 **File:** `assign_one_hermite.js`
 
