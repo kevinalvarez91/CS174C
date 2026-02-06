@@ -102,3 +102,8 @@ add point  5.0 5.0 0.0   -20.0  0.0  -20.0
 add point  0.0 5.0 0.0   -20.0  0.0   20.0
 get_arc_length
 ```
+
+### Note for Test Case 2
+When inputing get_arc_length, I get the following `22.955834`
+Compared to the `22.955833`, that the test case provides. This is due to a difference in sampling. **Note that the TA said that this difference
+in approximation is so small that it does not matter.**

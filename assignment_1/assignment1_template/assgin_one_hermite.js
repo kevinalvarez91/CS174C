@@ -426,8 +426,8 @@ export class Assign_one_hermite extends Assign_one_hermite_base
       // get_arc_length
       if (w[0] === "get_arc_length") {
         // Usage: get_arc_length [samples_per_segment] [rows]
-        console.log("[DEBUG] GET ARC LENGTH"); 
-        let sps  = 60;
+        console.log("[DEBUG] GET ARC LENGTH");
+        let sps  = 250;
         let rows = 25;
 
         if (w.length >= 2) {
@@ -445,24 +445,31 @@ export class Assign_one_hermite extends Assign_one_hermite_base
 
         const { total, table } = this.spline.arc_length_table(sps);
 
-        // Build output (reasonable number of rows) according to TA, we don't want to overload the machines
+        // Output header
         const out = [];
         out.push(`Arc length parameterization (piecewise linear approx)`);
-        out.push(`Arc length ≈ ${total.toFixed(6)}`);
-        out.push(`Lookup table (s -> t):`);
-        out.push(`s\t\tt`);
+        out.push(`Arc length = ${total.toFixed(6)}`);
+        out.push(`Lookup table (i, u, s):`);
+        out.push(`i\t\tu\t\ts`);
 
         const N = table.length;
-        for (let r = 0; r < rows; r++) {
-          const idx = Math.round(r * (N - 1) / (rows - 1));
+
+        // Choose 'rows' evenly spaced indices from [0 .. N-1]
+        for (let i = 0; i < rows; i++) {
+          const idx = Math.round(i * (N - 1) / (rows - 1));
+
+          // In your table: { s, t } where t is the parametric value in [0,1]
           const { s, t } = table[idx];
-          out.push(`${s.toFixed(6)}\t${t.toFixed(6)}`);
+
+          // Print index i (row number), u (param value), s (arc length)
+          out.push(`${i}\t\t${t.toFixed(6)}\t\t${s.toFixed(6)}`);
         }
 
         document.getElementById("output").value = out.join("\n");
-        applied++;         // count it as a command
-        return;            // dont print parsed ok
+        applied++;   // count it as a command
+        return;      // don't print parsed ok
       }
+
 
 
       throw new Error(`Unknown/invalid command: "${line}"`);
