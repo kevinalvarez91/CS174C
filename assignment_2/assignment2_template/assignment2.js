@@ -491,41 +491,21 @@ class Assignment2_base extends Component
 		// Control points + tangents for "8" (tangents are (dx,dy,0) in world coords)
 		// Figure-8 with smoother circular loops
 		const blackboard_z = -0.9; 
-		const P = [
-			vec3(3.0, 6.0, blackboard_z),   // center intersection
-			vec3(4.0, 7.0, blackboard_z),   // right of upper loop  
-			vec3(3.0, 8.0, blackboard_z),   // top
-			vec3(2.0, 7.0, blackboard_z),   // left of upper loop
-			vec3(3.0, 6.0, blackboard_z),   // back to center
-			vec3(2.0, 5.0, blackboard_z),   // left of lower loop
-			vec3(3.0, 4.0, blackboard_z),   // bottom
-			vec3(4.0, 5.0, blackboard_z),   // right of lower loop  
-			vec3(3.0, 6.0, blackboard_z),   // back to center
-		];
+this.spline.clear();
+      console.log("testing"); 
 
-		// Tangent at each point = perpendicular to radius from circle center
-		// Upper circle center: (3, 7), Lower circle center: (3, 5)
-		// Magnitude for smooth circle: approximately distance_to_next_point * (4/3) for 90-deg arc
-		const scale = 1.5; 
-		const M_local = [
-			vec3(1, 1, 0).normalized().times(scale),   // center: going straight up into upper loop
-			vec3(0, 1, 0).normalized().times(scale),   // (4,7): tangent pointing left
-			vec3(-1, 0, 0).normalized().times(scale),   // (3,8): tangent pointing down
-			vec3(0, -1, 0).normalized().times(scale),   // (2,7): tangent pointing right
-			vec3(1, -1, 0).normalized().times(scale),   // center: going straight down into lower loop
-			vec3(0, -1, 0).normalized().times(scale),   // (2,5): tangent pointing left
-			vec3(-1, 0, 0).normalized().times(scale),   // (3,4): tangent pointing up
-			vec3( 0, 1, 0).normalized().times(scale),   // (4,5): tangent pointing right
-			vec3(1, 1, 0).normalized().times(scale),   // center: going back up
-		];
+this.spline.add_point(vec3(-3.15,  0.146,  blackboard_z), vec3(-14.8,   8.442, 0));
+this.spline.add_point(vec3(-4.29,  1.32,   blackboard_z), vec3( 0.0,   12.42,  0));
+this.spline.add_point(vec3(-3.146, 2.276,  blackboard_z), vec3(10.43, -0.342,  0));
+this.spline.add_point(vec3(-1.92,  1.37,   blackboard_z), vec3(0.153, -13.37,  0));
+this.spline.add_point(vec3(-3.152, 0.1505, blackboard_z), vec3(-14.09, -8.14,  0));
+this.spline.add_point(vec3(-4.27, -1.08,   blackboard_z), vec3(1.08, -13.14,   0));
+this.spline.add_point(vec3(-3.065,-1.957,  blackboard_z), vec3(10.7, -0.144,   0));
+this.spline.add_point(vec3(-1.887,-1.082,  blackboard_z), vec3(-0.162, 14.15,  0));
 
-		const segs = P.length - 1; 
-		const TAN_GAIN = 1.0; 
+// Closing point (same as first)
+this.spline.add_point(vec3(-3.15,  0.146,  blackboard_z), vec3(-14.8, 8.442, 0));
 
-		this.spline.clear();
-		for (let i = 0; i < P.length; i++){
-			this.spline.add_point(P[i], M_local[i].times(segs * TAN_GAIN));  
-		}
 
 
 
