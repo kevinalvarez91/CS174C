@@ -492,20 +492,18 @@ class Assignment2_base extends Component
 		// Figure-8 with smoother circular loops
 		const blackboard_z = -0.9; 
 this.spline.clear();
-      console.log("testing"); 
 
-this.spline.add_point(vec3(-3.15,  0.146,  blackboard_z), vec3(-14.8,   8.442, 0));
-this.spline.add_point(vec3(-4.29,  1.32,   blackboard_z), vec3( 0.0,   12.42,  0));
-this.spline.add_point(vec3(-3.146, 2.276,  blackboard_z), vec3(10.43, -0.342,  0));
-this.spline.add_point(vec3(-1.92,  1.37,   blackboard_z), vec3(0.153, -13.37,  0));
-this.spline.add_point(vec3(-3.152, 0.1505, blackboard_z), vec3(-14.09, -8.14,  0));
-this.spline.add_point(vec3(-4.27, -1.08,   blackboard_z), vec3(1.08, -13.14,   0));
-this.spline.add_point(vec3(-3.065,-1.957,  blackboard_z), vec3(10.7, -0.144,   0));
-this.spline.add_point(vec3(-1.887,-1.082,  blackboard_z), vec3(-0.162, 14.15,  0));
+this.spline.add_point(vec3(-3.15 + 6.0,  0.146 + 6.0,  blackboard_z), vec3(-14.8,   8.442, 0));
+this.spline.add_point(vec3(-4.29 + 6.0,  1.32 + 6.0,   blackboard_z), vec3( 0.0,   12.42,  0));
+this.spline.add_point(vec3(-3.146 + 6.0, 2.276 + 6.0,  blackboard_z), vec3(10.43, -0.342,  0));
+this.spline.add_point(vec3(-1.92 + 6.0,  1.37 + 6.0,   blackboard_z), vec3(0.153, -13.37,  0));
+this.spline.add_point(vec3(-3.152 + 6.0, 0.1505 + 6.0, blackboard_z), vec3(-14.09, -8.14,  0));
+this.spline.add_point(vec3(-4.27 + 6.0, -1.08 + 6.0,   blackboard_z), vec3(1.08,  -13.14,  0));
+this.spline.add_point(vec3(-3.065 + 6.0,-1.957 + 6.0,  blackboard_z), vec3(10.7,  -0.144,  0));
+this.spline.add_point(vec3(-1.887 + 6.0,-1.082 + 6.0,  blackboard_z), vec3(-0.162, 14.15,  0));
 
 // Closing point (same as first)
-this.spline.add_point(vec3(-3.15,  0.146,  blackboard_z), vec3(-14.8, 8.442, 0));
-
+this.spline.add_point(vec3(-3.15 + 6.0,  0.146 + 6.0,  blackboard_z), vec3(-14.8, 8.442, 0));
 
 
 
