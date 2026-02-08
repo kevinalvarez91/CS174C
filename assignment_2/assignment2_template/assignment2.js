@@ -13,7 +13,7 @@ const Articulated_Human =
 class Articulated_Human {
 	constructor() {
 		const sphere_shape = shapes.sphere;
-    const torso_half_h = 1.5;       // matches Mat4.scale(_, 1.5, _)
+		const torso_half_h = 1.5;       // matches Mat4.scale(_, 1.5, _)
 		const shoulder_y   = torso_half_h * 0.75;  // ~upper torso
 		const neck_y       = torso_half_h * 1.00;  // top of torso
 		const hip_y        = -torso_half_h * 0.90; // bottom-ish of torso
@@ -61,8 +61,8 @@ class Articulated_Human {
 				r_wrist_location);
 		this.rl_arm_node.children_arcs.push(this.r_wrist); 
 
-    // left arm
-    let lu_arm_transform = Mat4.scale(1.2, .2, .2);
+		// left arm
+		let lu_arm_transform = Mat4.scale(1.2, .2, .2);
 		lu_arm_transform.pre_multiply(Mat4.translation(-1.2, 0, 0));
 		this.lu_arm_node = new Node("lu_arm", sphere_shape, lu_arm_transform);
 
@@ -91,14 +91,14 @@ class Articulated_Human {
 		this.l_wrist = new Arc("l_wrist", this.ll_arm_node, this.l_hand_node, l_wrist_location);
 		this.ll_arm_node.children_arcs.push(this.l_wrist);
 
-    		// =========================
+		// =========================
 		// LEGS (neutral standing)
 		// =========================
 
 		// --- Right upper leg node ---
-let ru_leg_transform = Mat4.scale(0.35, 0.85, 0.35);
-ru_leg_transform.pre_multiply(Mat4.translation(0, -0.85, 0));
-this.ru_leg_node = new Node("ru_leg", sphere_shape, ru_leg_transform);
+		let ru_leg_transform = Mat4.scale(0.35, 0.85, 0.35);
+		ru_leg_transform.pre_multiply(Mat4.translation(0, -0.85, 0));
+		this.ru_leg_node = new Node("ru_leg", sphere_shape, ru_leg_transform);
 
 		// torso -> r_hip -> ru_leg
 		const r_hip_location = Mat4.translation(0.45, hip_y, 0);
@@ -106,12 +106,12 @@ this.ru_leg_node = new Node("ru_leg", sphere_shape, ru_leg_transform);
 		this.torso_node.children_arcs.push(this.r_hip);
 
 		// --- Right lower leg node ---
-let rl_leg_transform = Mat4.scale(0.3, 0.75, 0.3);
-rl_leg_transform.pre_multiply(Mat4.translation(0, -0.75, 0));
-this.rl_leg_node = new Node("rl_leg", sphere_shape, rl_leg_transform);
+		let rl_leg_transform = Mat4.scale(0.3, 0.75, 0.3);
+		rl_leg_transform.pre_multiply(Mat4.translation(0, -0.75, 0));
+		this.rl_leg_node = new Node("rl_leg", sphere_shape, rl_leg_transform);
 
 		// ru_leg -> r_knee -> rl_leg
-const r_knee_location = Mat4.translation(0, -1.7, 0);
+		const r_knee_location = Mat4.translation(0, -1.7, 0);
 		this.r_knee = new Arc("r_knee", this.ru_leg_node, this.rl_leg_node, r_knee_location);
 		this.ru_leg_node.children_arcs.push(this.r_knee);
 
@@ -124,15 +124,15 @@ const r_knee_location = Mat4.translation(0, -1.7, 0);
 
 
 		// rl_leg -> r_ankle -> r_foot
-const r_ankle_location = Mat4.translation(0, -1.5, 0);
+		const r_ankle_location = Mat4.translation(0, -1.5, 0);
 		this.r_ankle = new Arc("r_ankle", this.rl_leg_node, this.r_foot_node, r_ankle_location);
 		this.rl_leg_node.children_arcs.push(this.r_ankle);
 
 
 		// --- Left upper leg node ---
-let lu_leg_transform = Mat4.scale(0.35, 0.85, 0.35);
-lu_leg_transform.pre_multiply(Mat4.translation(0, -0.85, 0));
-this.lu_leg_node = new Node("lu_leg", sphere_shape, lu_leg_transform);
+		let lu_leg_transform = Mat4.scale(0.35, 0.85, 0.35);
+		lu_leg_transform.pre_multiply(Mat4.translation(0, -0.85, 0));
+		this.lu_leg_node = new Node("lu_leg", sphere_shape, lu_leg_transform);
 
 		// torso -> l_hip -> lu_leg
 		const l_hip_location = Mat4.translation(-0.45, hip_y, 0);
@@ -140,12 +140,12 @@ this.lu_leg_node = new Node("lu_leg", sphere_shape, lu_leg_transform);
 		this.torso_node.children_arcs.push(this.l_hip);
 
 		// --- Left lower leg node ---
-let ll_leg_transform = Mat4.scale(0.3, 0.75, 0.3);
-ll_leg_transform.pre_multiply(Mat4.translation(0, -0.75, 0));
-this.ll_leg_node = new Node("ll_leg", sphere_shape, ll_leg_transform);
+		let ll_leg_transform = Mat4.scale(0.3, 0.75, 0.3);
+		ll_leg_transform.pre_multiply(Mat4.translation(0, -0.75, 0));
+		this.ll_leg_node = new Node("ll_leg", sphere_shape, ll_leg_transform);
 
 		// lu_leg -> l_knee -> ll_leg
-const l_knee_location = Mat4.translation(0, -1.7, 0);
+		const l_knee_location = Mat4.translation(0, -1.7, 0);
 		this.l_knee = new Arc("l_knee", this.lu_leg_node, this.ll_leg_node, l_knee_location);
 		this.lu_leg_node.children_arcs.push(this.l_knee);
 
@@ -155,7 +155,7 @@ const l_knee_location = Mat4.translation(0, -1.7, 0);
 		this.l_foot_node = new Node("l_foot", sphere_shape, l_foot_transform);
 
 		// ll_leg -> l_ankle -> l_foot
-const l_ankle_location = Mat4.translation(0, -1.5, 0);
+		const l_ankle_location = Mat4.translation(0, -1.5, 0);
 		this.l_ankle = new Arc("l_ankle", this.ll_leg_node, this.l_foot_node, l_ankle_location);
 		this.ll_leg_node.children_arcs.push(this.l_ankle);
 
