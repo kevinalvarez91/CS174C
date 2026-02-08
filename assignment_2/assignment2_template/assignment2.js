@@ -14,10 +14,10 @@ class Articulated_Human {
 	constructor() {
 		const sphere_shape = shapes.sphere;
 		// torso node
-		const torso_transform = Mat4.scale(1, 2.5, 0.5);
+		const torso_transform = Mat4.scale(1, 1.5, 0.5); // (1, 2.5, 0.5)
 		this.torso_node = new Node("torso", sphere_shape, torso_transform);
 		// root->torso
-		const root_location = Mat4.translation(-2, 5, 0);
+		const root_location = Mat4.translation(0, 5, 0); // (-2, 5, 0);
 		this.root = new Arc("root", null, this.torso_node, root_location);
 		// head node
 		let head_transform = Mat4.scale(.6, .6, .6);
@@ -54,13 +54,113 @@ class Articulated_Human {
 		const r_wrist_location = Mat4.translation(2, 0, 0);
 		this.r_wrist = new Arc("r_wrist", this.rl_arm_node, this.r_hand_node,
 				r_wrist_location);
-		this.rl_arm_node.children_arcs.push(this.r_wrist)
+		this.rl_arm_node.children_arcs.push(this.r_wrist); 
+
+    // left arm
+    let lu_arm_transform = Mat4.scale(1.2, .2, .2);
+		lu_arm_transform.pre_multiply(Mat4.translation(-1.2, 0, 0));
+		this.lu_arm_node = new Node("lu_arm", sphere_shape, lu_arm_transform);
+
+		// torso->l_shoulder->lu_arm
+		const l_shoulder_location = Mat4.translation(-0.6, 2, 0);
+		this.l_shoulder = new Arc("l_shoulder", this.torso_node, this.lu_arm_node, l_shoulder_location);
+		this.torso_node.children_arcs.push(this.l_shoulder);
+
+		// left lower arm node
+		let ll_arm_transform = Mat4.scale(1, .2, .2);
+		ll_arm_transform.pre_multiply(Mat4.translation(-1, 0, 0));
+		this.ll_arm_node = new Node("ll_arm", sphere_shape, ll_arm_transform);
+
+		// lu_arm->l_elbow->ll_arm
+		const l_elbow_location = Mat4.translation(-2.4, 0, 0);
+		this.l_elbow = new Arc("l_elbow", this.lu_arm_node, this.ll_arm_node, l_elbow_location);
+		this.lu_arm_node.children_arcs.push(this.l_elbow);
+
+		// left hand node
+		let l_hand_transform = Mat4.scale(.4, .3, .2);
+		l_hand_transform.pre_multiply(Mat4.translation(-0.4, 0, 0));
+		this.l_hand_node = new Node("l_hand", sphere_shape, l_hand_transform);
+
+		// ll_arm->l_wrist->l_hand
+		const l_wrist_location = Mat4.translation(-2, 0, 0);
+		this.l_wrist = new Arc("l_wrist", this.ll_arm_node, this.l_hand_node, l_wrist_location);
+		this.ll_arm_node.children_arcs.push(this.l_wrist);
+
+    		// =========================
+		// LEGS (neutral standing)
+		// =========================
+
+		// --- Right upper leg node ---
+		let ru_leg_transform = Mat4.scale(0.35, 1.2, 0.35);
+		// move the leg geometry DOWN from the hip joint
+		ru_leg_transform.pre_multiply(Mat4.translation(0, -1.2, 0));
+		this.ru_leg_node = new Node("ru_leg", sphere_shape, ru_leg_transform);
+
+		// torso -> r_hip -> ru_leg
+		const r_hip_location = Mat4.translation(0.45, -2.2, 0);
+		this.r_hip = new Arc("r_hip", this.torso_node, this.ru_leg_node, r_hip_location);
+		this.torso_node.children_arcs.push(this.r_hip);
+
+		// --- Right lower leg node ---
+		let rl_leg_transform = Mat4.scale(0.3, 1.1, 0.3);
+		rl_leg_transform.pre_multiply(Mat4.translation(0, -1.1, 0));
+		this.rl_leg_node = new Node("rl_leg", sphere_shape, rl_leg_transform);
+
+		// ru_leg -> r_knee -> rl_leg
+		const r_knee_location = Mat4.translation(0, -2.4, 0);
+		this.r_knee = new Arc("r_knee", this.ru_leg_node, this.rl_leg_node, r_knee_location);
+		this.ru_leg_node.children_arcs.push(this.r_knee);
+
+		// --- Right foot node ---
+		let r_foot_transform = Mat4.scale(0.45, 0.18, 0.75);
+		// down a bit, and forward a bit (toe direction = +Z)
+		r_foot_transform.pre_multiply(Mat4.translation(0, -0.18, 0.45));
+		this.r_foot_node = new Node("r_foot", sphere_shape, r_foot_transform);
+
+		// rl_leg -> r_ankle -> r_foot
+		const r_ankle_location = Mat4.translation(0, -2.2, 0);
+		this.r_ankle = new Arc("r_ankle", this.rl_leg_node, this.r_foot_node, r_ankle_location);
+		this.rl_leg_node.children_arcs.push(this.r_ankle);
+
+
+		// --- Left upper leg node ---
+		let lu_leg_transform = Mat4.scale(0.35, 1.2, 0.35);
+		lu_leg_transform.pre_multiply(Mat4.translation(0, -1.2, 0));
+		this.lu_leg_node = new Node("lu_leg", sphere_shape, lu_leg_transform);
+
+		// torso -> l_hip -> lu_leg
+		const l_hip_location = Mat4.translation(-0.45, -2.2, 0);
+		this.l_hip = new Arc("l_hip", this.torso_node, this.lu_leg_node, l_hip_location);
+		this.torso_node.children_arcs.push(this.l_hip);
+
+		// --- Left lower leg node ---
+		let ll_leg_transform = Mat4.scale(0.3, 1.1, 0.3);
+		ll_leg_transform.pre_multiply(Mat4.translation(0, -1.1, 0));
+		this.ll_leg_node = new Node("ll_leg", sphere_shape, ll_leg_transform);
+
+		// lu_leg -> l_knee -> ll_leg
+		const l_knee_location = Mat4.translation(0, -2.4, 0);
+		this.l_knee = new Arc("l_knee", this.lu_leg_node, this.ll_leg_node, l_knee_location);
+		this.lu_leg_node.children_arcs.push(this.l_knee);
+
+		// --- Left foot node ---
+		let l_foot_transform = Mat4.scale(0.45, 0.18, 0.75);
+		l_foot_transform.pre_multiply(Mat4.translation(0, -0.18, 0.45));
+		this.l_foot_node = new Node("l_foot", sphere_shape, l_foot_transform);
+
+		// ll_leg -> l_ankle -> l_foot
+		const l_ankle_location = Mat4.translation(0, -2.2, 0);
+		this.l_ankle = new Arc("l_ankle", this.ll_leg_node, this.l_foot_node, l_ankle_location);
+		this.ll_leg_node.children_arcs.push(this.l_ankle);
+
 	}
+
 	draw(webgl_manager, uniforms, material) {
 		this.matrix_stack = [];
 		this._rec_draw(this.root, Mat4.identity(), webgl_manager, uniforms,
 				material);
 	}
+
 	_rec_draw(arc, matrix, webgl_manager, uniforms, material) {
 		if (arc !== null) {
 			const L = arc.location_matrix;
@@ -80,6 +180,7 @@ class Articulated_Human {
 			}
 		}
 	}
+
 	debug(arc=null) {
 		if (arc === null)
 			arc = this.root;
@@ -92,7 +193,7 @@ class Articulated_Human {
 			this.debug(next_arc);
 		}
 	}
-	// Inside the Articulated_Human class
+
 	solve_ik(target_pos) {
 		// Joints in order
 		const joints = [this.r_shoulder, this.r_elbow, this.r_wrist];
@@ -205,32 +306,32 @@ class Articulated_Human {
 	// Inside Articulated_Human class
 
 	// Helper to find the world-space matrix of a specific Arc (joint)
-	get_arc_world_matrix(target_arc) {
-		let world_matrix = Mat4.identity();
+	// get_arc_world_matrix(target_arc) {
+	// 	let world_matrix = Mat4.identity();
 
-		// Recursive helper to traverse the tree and find the target arc
-		const find_matrix = (current_arc, current_matrix) => {
-			if (!current_arc) return null;
+	// 	// Recursive helper to traverse the tree and find the target arc
+	// 	const find_matrix = (current_arc, current_matrix) => {
+	// 		if (!current_arc) return null;
 
-			const L = current_arc.location_matrix;
-			const A = current_arc.articulation_matrix;
-			// Apply this arc's transformations
-			const new_matrix = current_matrix.times(L).times(A);
+	// 		const L = current_arc.location_matrix;
+	// 		const A = current_arc.articulation_matrix;
+	// 		// Apply this arc's transformations
+	// 		const new_matrix = current_matrix.times(L).times(A);
 
-			if (current_arc === target_arc) {
-				return new_matrix;
-			}
+	// 		if (current_arc === target_arc) {
+	// 			return new_matrix;
+	// 		}
 
-			const node = current_arc.child_node;
-			for (const next_arc of node.children_arcs) {
-				const found = find_matrix(next_arc, new_matrix);
-				if (found) return found;
-			}
-			return null;
-		};
+	// 		const node = current_arc.child_node;
+	// 		for (const next_arc of node.children_arcs) {
+	// 			const found = find_matrix(next_arc, new_matrix);
+	// 			if (found) return found;
+	// 		}
+	// 		return null;
+	// 	};
 
-		return find_matrix(this.root, world_matrix);
-	}
+	// 	return find_matrix(this.root, world_matrix);
+	// }
 
 	// Returns the world-space position of a joint
 	get_joint_world_pos(joint_arc) {
