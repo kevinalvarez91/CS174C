@@ -13,6 +13,10 @@ const Articulated_Human =
 class Articulated_Human {
 	constructor() {
 		const sphere_shape = shapes.sphere;
+    const SKIN  = color(0.88, 0.74, 0.60, 1.0); // slightly tanned
+		const PANTS = color(0.10, 0.25, 0.95, 1.0); // blue
+		const SHIRT = color(0.10, 0.80, 0.25, 1.0); // green 
+
 		const torso_half_h = 1.5;       // matches Mat4.scale(_, 1.5, _)
 		const shoulder_y   = torso_half_h * 0.75;  // ~upper torso
 		const neck_y       = torso_half_h * 1.00;  // top of torso
@@ -20,14 +24,14 @@ class Articulated_Human {
 
 		// torso node
 		const torso_transform = Mat4.scale(1, torso_half_h, 0.5); // (1, 2.5, 0.5)
-		this.torso_node = new Node("torso", sphere_shape, torso_transform);
+		this.torso_node = new Node("torso", sphere_shape, torso_transform, SHIRT);
 		// root->torso
 		const root_location = Mat4.translation(0, 5, 0); // (-2, 5, 0);
 		this.root = new Arc("root", null, this.torso_node, root_location);
 		// head node
 		let head_transform = Mat4.scale(.6, .6, .6);
 		head_transform.pre_multiply(Mat4.translation(0, .6, 0));
-		this.head_node = new Node("head", sphere_shape, head_transform);
+		this.head_node = new Node("head", sphere_shape, head_transform, SKIN);
 		// torso->neck->head
 		const neck_location = Mat4.translation(0, neck_y, 0);
 		this.neck = new Arc("neck", this.torso_node, this.head_node,
@@ -36,7 +40,7 @@ class Articulated_Human {
 		// right upper arm node
 		let ru_arm_transform = Mat4.scale(1.2, .2, .2);
 		ru_arm_transform.pre_multiply(Mat4.translation(1.2, 0, 0));
-		this.ru_arm_node = new Node("ru_arm", sphere_shape, ru_arm_transform);
+		this.ru_arm_node = new Node("ru_arm", sphere_shape, ru_arm_transform, SHIRT);
 		// torso->r_shoulder->ru_arm
 		const r_shoulder_location = Mat4.translation(0.6, shoulder_y, 0);
 		this.r_shoulder = new Arc("r_shoulder", this.torso_node, this.ru_arm_node,
@@ -45,7 +49,7 @@ class Articulated_Human {
 			// right lower arm node
 			let rl_arm_transform = Mat4.scale(1, .2, .2);
 		rl_arm_transform.pre_multiply(Mat4.translation(1, 0, 0));
-		this.rl_arm_node = new Node("rl_arm", sphere_shape, rl_arm_transform);
+		this.rl_arm_node = new Node("rl_arm", sphere_shape, rl_arm_transform, SKIN);
 		// ru_arm->r_elbow->rl_arm
 		const r_elbow_location = Mat4.translation(2.4, 0, 0);
 		this.r_elbow = new Arc("r_elbow", this.ru_arm_node, this.rl_arm_node,
@@ -54,7 +58,7 @@ class Articulated_Human {
 			// right hand node
 			let r_hand_transform = Mat4.scale(.4, .3, .2);
 		r_hand_transform.pre_multiply(Mat4.translation(0.4, 0, 0));
-		this.r_hand_node = new Node("r_hand", sphere_shape, r_hand_transform);
+		this.r_hand_node = new Node("r_hand", sphere_shape, r_hand_transform, SKIN);
 		// rl_arm->r_wrist->r_hand
 		const r_wrist_location = Mat4.translation(2, 0, 0);
 		this.r_wrist = new Arc("r_wrist", this.rl_arm_node, this.r_hand_node,
@@ -64,7 +68,7 @@ class Articulated_Human {
 		// left arm
 		let lu_arm_transform = Mat4.scale(1.2, .2, .2);
 		lu_arm_transform.pre_multiply(Mat4.translation(-1.2, 0, 0));
-		this.lu_arm_node = new Node("lu_arm", sphere_shape, lu_arm_transform);
+		this.lu_arm_node = new Node("lu_arm", sphere_shape, lu_arm_transform, SHIRT);
 
 		// torso->l_shoulder->lu_arm
 		const l_shoulder_location = Mat4.translation(-0.6, shoulder_y, 0);
@@ -74,7 +78,7 @@ class Articulated_Human {
 		// left lower arm node
 		let ll_arm_transform = Mat4.scale(1, .2, .2);
 		ll_arm_transform.pre_multiply(Mat4.translation(-1, 0, 0));
-		this.ll_arm_node = new Node("ll_arm", sphere_shape, ll_arm_transform);
+		this.ll_arm_node = new Node("ll_arm", sphere_shape, ll_arm_transform, SKIN);
 
 		// lu_arm->l_elbow->ll_arm
 		const l_elbow_location = Mat4.translation(-2.4, 0, 0);
@@ -84,7 +88,7 @@ class Articulated_Human {
 		// left hand node
 		let l_hand_transform = Mat4.scale(.4, .3, .2);
 		l_hand_transform.pre_multiply(Mat4.translation(-0.4, 0, 0));
-		this.l_hand_node = new Node("l_hand", sphere_shape, l_hand_transform);
+		this.l_hand_node = new Node("l_hand", sphere_shape, l_hand_transform, SKIN);
 
 		// ll_arm->l_wrist->l_hand
 		const l_wrist_location = Mat4.translation(-2, 0, 0);
@@ -98,7 +102,7 @@ class Articulated_Human {
 		// --- Right upper leg node ---
 		let ru_leg_transform = Mat4.scale(0.35, 0.85, 0.35);
 		ru_leg_transform.pre_multiply(Mat4.translation(0, -0.85, 0));
-		this.ru_leg_node = new Node("ru_leg", sphere_shape, ru_leg_transform);
+		this.ru_leg_node = new Node("ru_leg", sphere_shape, ru_leg_transform, PANTS);
 
 		// torso -> r_hip -> ru_leg
 		const r_hip_location = Mat4.translation(0.45, hip_y, 0);
@@ -108,7 +112,7 @@ class Articulated_Human {
 		// --- Right lower leg node ---
 		let rl_leg_transform = Mat4.scale(0.3, 0.75, 0.3);
 		rl_leg_transform.pre_multiply(Mat4.translation(0, -0.75, 0));
-		this.rl_leg_node = new Node("rl_leg", sphere_shape, rl_leg_transform);
+		this.rl_leg_node = new Node("rl_leg", sphere_shape, rl_leg_transform, PANTS);
 
 		// ru_leg -> r_knee -> rl_leg
 		const r_knee_location = Mat4.translation(0, -1.7, 0);
@@ -119,7 +123,7 @@ class Articulated_Human {
 		let r_foot_transform = Mat4.scale(0.45, 0.18, 0.75);
 		// down a bit, and forward a bit (toe direction = +Z)
 		r_foot_transform.pre_multiply(Mat4.translation(0, -0.18, 0.45));
-		this.r_foot_node = new Node("r_foot", sphere_shape, r_foot_transform);
+		this.r_foot_node = new Node("r_foot", sphere_shape, r_foot_transform, SKIN);
 
 
 
@@ -132,7 +136,7 @@ class Articulated_Human {
 		// --- Left upper leg node ---
 		let lu_leg_transform = Mat4.scale(0.35, 0.85, 0.35);
 		lu_leg_transform.pre_multiply(Mat4.translation(0, -0.85, 0));
-		this.lu_leg_node = new Node("lu_leg", sphere_shape, lu_leg_transform);
+		this.lu_leg_node = new Node("lu_leg", sphere_shape, lu_leg_transform, PANTS);
 
 		// torso -> l_hip -> lu_leg
 		const l_hip_location = Mat4.translation(-0.45, hip_y, 0);
@@ -142,7 +146,7 @@ class Articulated_Human {
 		// --- Left lower leg node ---
 		let ll_leg_transform = Mat4.scale(0.3, 0.75, 0.3);
 		ll_leg_transform.pre_multiply(Mat4.translation(0, -0.75, 0));
-		this.ll_leg_node = new Node("ll_leg", sphere_shape, ll_leg_transform);
+		this.ll_leg_node = new Node("ll_leg", sphere_shape, ll_leg_transform, PANTS);
 
 		// lu_leg -> l_knee -> ll_leg
 		const l_knee_location = Mat4.translation(0, -1.7, 0);
@@ -152,7 +156,7 @@ class Articulated_Human {
 		// --- Left foot node ---
 		let l_foot_transform = Mat4.scale(0.45, 0.18, 0.75);
 		l_foot_transform.pre_multiply(Mat4.translation(0, -0.18, 0.45));
-		this.l_foot_node = new Node("l_foot", sphere_shape, l_foot_transform);
+		this.l_foot_node = new Node("l_foot", sphere_shape, l_foot_transform, SKIN);
 
 		// ll_leg -> l_ankle -> l_foot
 		const l_ankle_location = Mat4.translation(0, -1.5, 0);
@@ -178,7 +182,9 @@ class Articulated_Human {
 			const node = arc.child_node;
 			const T = node.transform_matrix;
 			matrix.post_multiply(T);
-			node.shape.draw(webgl_manager, uniforms, matrix, material);
+			//node.shape.draw(webgl_manager, uniforms, matrix, material);
+      const node_material = node.color_override ? { ...material, color: node.color_override } : material;
+      node.shape.draw(webgl_manager, uniforms, matrix, node_material);
 			matrix = this.matrix_stack.pop();
 			for (const next_arc of node.children_arcs) {
 				this.matrix_stack.push(matrix.copy());
@@ -375,11 +381,12 @@ class Articulated_Human {
 
 
 class Node {
-	constructor(name, shape, transform) {
+	constructor(name, shape, transform, color_override = null) {
 		this.name = name;
 		this.shape = shape;
 		this.transform_matrix = transform;
 		this.children_arcs = [];
+    this.color_override = color_override; 
 	}
 }
 
