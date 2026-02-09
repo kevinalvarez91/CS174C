@@ -249,7 +249,7 @@ class Articulated_Human {
 		const dtheta = solve_linear_system(J, [dx_vec[0], dx_vec[1], dx_vec[2]]);
 
 		// Apply with a small gain for stability
-		const gain = 0.025;
+		const gain = 0.5; // 0.025
 		let k = 0;
 
 		// shoulder: x,y,z
@@ -300,21 +300,35 @@ class Articulated_Human {
 		return find_matrix(this.root, matrix);
 	}
 
-	get_end_effector_position() {
-		// World matrix up to wrist joint (includes wrist L and wrist A)
-		const Mwrist = this.get_arc_world_matrix(this.r_wrist);
-		if (!Mwrist) return vec3(0,0,0);
+	// get_end_effector_position() {
+	// 	// World matrix up to wrist joint (includes wrist L and wrist A)
+	// 	const Mwrist = this.get_arc_world_matrix(this.r_wrist);
+	// 	if (!Mwrist) return vec3(0,0,0);
 
-		// Include hand node's transform (scale + pre-translate)
-		const Thand = this.r_hand_node.transform_matrix;
+	// 	// Include hand node's transform (scale + pre-translate)
+	// 	const Thand = this.r_hand_node.transform_matrix;
 
-		// Tip in hand-local coords: your pre_multiply translation is 0.4,
-		// so a reasonable "tip" is about x = 0.8 from the hand's local origin.
-		const Mtip = Mwrist.times(Thand).times(Mat4.translation(0.8, 0, 0));
+	// 	// Tip in hand-local coords: your pre_multiply translation is 0.4,
+	// 	// so a reasonable "tip" is about x = 0.8 from the hand's local origin.
+	// 	const Mtip = Mwrist.times(Thand).times(Mat4.translation(0.8, 0, 0));
 
-		const p4 = Mtip.times(vec4(0,0,0,1));
-		return vec3(p4[0], p4[1], p4[2]);
-	}
+	// 	const p4 = Mtip.times(vec4(0,0,0,1));
+	// 	return vec3(p4[0], p4[1], p4[2]);
+	// }
+
+get_end_effector_position() {
+  const Mwrist = this.get_arc_world_matrix(this.r_wrist);
+  if (!Mwrist) return vec3(0,0,0);
+
+  const Thand = this.r_hand_node.transform_matrix;
+
+  // A point on the "front" of the hand sphere in the hand's local space.
+  // Because r_hand_node is: T(0.4,0,0) * S(0.4,0.3,0.2),
+  // the world tip ends up at x ≈ 0.8 from wrist when you feed in (1,0,0,1).
+  const p4 = Mwrist.times(Thand).times(vec4(1, 0, 0, 1));
+  return vec3(p4[0], p4[1], p4[2]);
+}
+
 
 
 	// Inside Articulated_Human class
@@ -367,14 +381,14 @@ class Articulated_Human {
 
 
 	// Updated version of the end effector helper
-	get_end_effector_position() {
-		// We want the tip of the hand. 
-		// In your constructor, r_hand_node has a pre_multiply(Mat4.translation(0.4, 0, 0))
-		// and a scale(.4, .3, .2). The tip is roughly at local x = 0.8
-		const world_matrix = this.get_arc_world_matrix(this.r_wrist);
-		if (!world_matrix) return vec3(0,0,0);
-		return world_matrix.times(Mat4.translation(0.8, 0, 0)).times(vec4(0, 0, 0, 1)).to3();
-	}
+	// get_end_effector_position() {
+	// 	// We want the tip of the hand. 
+	// 	// In your constructor, r_hand_node has a pre_multiply(Mat4.translation(0.4, 0, 0))
+	// 	// and a scale(.4, .3, .2). The tip is roughly at local x = 0.8
+	// 	const world_matrix = this.get_arc_world_matrix(this.r_wrist);
+	// 	if (!world_matrix) return vec3(0,0,0);
+	// 	return world_matrix.times(Mat4.translation(0.8, 0, 0)).times(vec4(0, 0, 0, 1)).to3();
+	// }
 
 
 }
@@ -570,7 +584,8 @@ class Assignment2_base extends Component
 	// isolating that code so it can be experimented with on its own.
 	init()
 	{
-		console.log("init") 
+		console.log("init"); 
+
 
 			// constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
 			this.hover = this.swarm = false;
@@ -631,8 +646,8 @@ class Assignment2_base extends Component
 
 		this.hand_reached_board = false; 
 		this.initial_target = vec3(3.0, 6.0, -0.9); // Adjust to match your blackboard position
-
 		this.spline_u = 0.0; 
+		this.initial_target = this.spline.evaluate(this.spline_u); 
 		this.spline_speed = 0.1;
 
 	}
@@ -743,7 +758,15 @@ export class Assignment2 extends Assignment2_base
 			const end_pos = this.human.get_end_effector_position();
 			const distance = this.initial_target.minus(end_pos).norm();
 
-			this.human.solve_ik(this.initial_target);
+			//this.human.solve_ik(this.initial_target);
+
+			const target_on_spline = this.spline.evaluate(this.spline_u); 
+
+			for (let iter = 0; iter < 15; iter++){
+				const e = target_on_spline.minus(this.human.get_end_effector_position().norm()); 
+				if (e <0.01) break; 
+				this.human.solve_ik(target_on_spline); 
+			}
 
 			if (distance < 0.1) {
 				this.hand_reached_board = true;
@@ -763,7 +786,14 @@ export class Assignment2 extends Assignment2_base
 			const target_on_spline = this.spline.evaluate(this.spline_u);
 
 			// move hand toward that moving target
-			this.human.solve_ik(target_on_spline);
+			// this.human.solve_ik(target_on_spline);
+			for (let i = 0; i < 10; i++){ 
+				this.human.solve_ik(target_on_spline);
+
+				const current_pos = this.human.get_end_effector_position();
+				const dist = current_pos.minus(target_on_spline).norm();
+				if (dist < 0.001) break;
+			}
 		}
 		// ------------------------------
 
