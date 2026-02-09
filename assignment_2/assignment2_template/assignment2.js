@@ -13,7 +13,7 @@ const Articulated_Human =
 class Articulated_Human {
 	constructor() {
 		const sphere_shape = shapes.sphere;
-    const SKIN  = color(0.88, 0.74, 0.60, 1.0); // slightly tanned
+		const SKIN  = color(0.88, 0.74, 0.60, 1.0); // slightly tanned
 		const PANTS = color(0.10, 0.25, 0.95, 1.0); // blue
 		const SHIRT = color(0.10, 0.80, 0.25, 1.0); // green 
 
@@ -125,13 +125,10 @@ class Articulated_Human {
 		r_foot_transform.pre_multiply(Mat4.translation(0, -0.18, 0.45));
 		this.r_foot_node = new Node("r_foot", sphere_shape, r_foot_transform, SKIN);
 
-
-
 		// rl_leg -> r_ankle -> r_foot
 		const r_ankle_location = Mat4.translation(0, -1.5, 0);
 		this.r_ankle = new Arc("r_ankle", this.rl_leg_node, this.r_foot_node, r_ankle_location);
 		this.rl_leg_node.children_arcs.push(this.r_ankle);
-
 
 		// --- Left upper leg node ---
 		let lu_leg_transform = Mat4.scale(0.35, 0.85, 0.35);
@@ -162,9 +159,6 @@ class Articulated_Human {
 		const l_ankle_location = Mat4.translation(0, -1.5, 0);
 		this.l_ankle = new Arc("l_ankle", this.ll_leg_node, this.l_foot_node, l_ankle_location);
 		this.ll_leg_node.children_arcs.push(this.l_ankle);
-
-
-
 	}
 
 	draw(webgl_manager, uniforms, material) {
@@ -183,8 +177,8 @@ class Articulated_Human {
 			const T = node.transform_matrix;
 			matrix.post_multiply(T);
 			//node.shape.draw(webgl_manager, uniforms, matrix, material);
-      const node_material = node.color_override ? { ...material, color: node.color_override } : material;
-      node.shape.draw(webgl_manager, uniforms, matrix, node_material);
+			const node_material = node.color_override ? { ...material, color: node.color_override } : material;
+			node.shape.draw(webgl_manager, uniforms, matrix, node_material);
 			matrix = this.matrix_stack.pop();
 			for (const next_arc of node.children_arcs) {
 				this.matrix_stack.push(matrix.copy());
@@ -211,7 +205,6 @@ class Articulated_Human {
 	solve_ik(target_pos) {
 		// Joints in order
 		const joints = [this.r_shoulder, this.r_elbow, this.r_wrist];
-
 		// Per-spec DOFs:
 		// shoulder: x,y,z  (3)
 		// elbow:    x,y    (2)
@@ -237,7 +230,7 @@ class Articulated_Human {
 			const axes = axes_by_joint.get(joint);
 			for (const axis_local of axes) {
 				const axis_world = this.get_joint_world_axis(joint, axis_local);
-				const col = axis_world.cross(r); // (a x r)
+				const col = axis_world.cross(r); 
 
 				J[0].push(col[0]);
 				J[1].push(col[1]);
@@ -251,7 +244,6 @@ class Articulated_Human {
 		// Apply with a small gain for stability
 		const gain = 0.5; // 0.025
 		let k = 0;
-
 		// shoulder: x,y,z
 		{
 			const rx = gain * dtheta[k++], ry = gain * dtheta[k++], rz = gain * dtheta[k++];
@@ -260,7 +252,6 @@ class Articulated_Human {
 				.times(Mat4.rotation(ry, 0,1,0))
 				.times(Mat4.rotation(rz, 0,0,1));
 		}
-
 		// elbow: x,y
 		{
 			const rx = gain * dtheta[k++], ry = gain * dtheta[k++];
@@ -268,7 +259,6 @@ class Articulated_Human {
 				.times(Mat4.rotation(rx, 1,0,0))
 				.times(Mat4.rotation(ry, 0,1,0));
 		}
-
 		// wrist: y,z
 		{
 			const ry = gain * dtheta[k++], rz = gain * dtheta[k++];
@@ -278,8 +268,6 @@ class Articulated_Human {
 		}
 	}
 
-
-	// Inside Articulated_Human class in assignment2.js
 	get_arc_world_matrix(target_arc) {
 		let matrix = Mat4.identity();
 		const find_matrix = (arc, current_matrix) => {
@@ -300,66 +288,17 @@ class Articulated_Human {
 		return find_matrix(this.root, matrix);
 	}
 
-	// get_end_effector_position() {
-	// 	// World matrix up to wrist joint (includes wrist L and wrist A)
-	// 	const Mwrist = this.get_arc_world_matrix(this.r_wrist);
-	// 	if (!Mwrist) return vec3(0,0,0);
 
-	// 	// Include hand node's transform (scale + pre-translate)
-	// 	const Thand = this.r_hand_node.transform_matrix;
+	get_end_effector_position() {
+		const Mwrist = this.get_arc_world_matrix(this.r_wrist);
+		if (!Mwrist) return vec3(0,0,0);
 
-	// 	// Tip in hand-local coords: your pre_multiply translation is 0.4,
-	// 	// so a reasonable "tip" is about x = 0.8 from the hand's local origin.
-	// 	const Mtip = Mwrist.times(Thand).times(Mat4.translation(0.8, 0, 0));
+		const Thand = this.r_hand_node.transform_matrix;
 
-	// 	const p4 = Mtip.times(vec4(0,0,0,1));
-	// 	return vec3(p4[0], p4[1], p4[2]);
-	// }
+		const p4 = Mwrist.times(Thand).times(vec4(0.6, 0, 0, 1)); 
+		return vec3(p4[0], p4[1], p4[2]);
+	}
 
-get_end_effector_position() {
-  const Mwrist = this.get_arc_world_matrix(this.r_wrist);
-  if (!Mwrist) return vec3(0,0,0);
-
-  const Thand = this.r_hand_node.transform_matrix;
-
-  // A point on the "front" of the hand sphere in the hand's local space.
-  // Because r_hand_node is: T(0.4,0,0) * S(0.4,0.3,0.2),
-  // the world tip ends up at x ≈ 0.8 from wrist when you feed in (1,0,0,1).
-  const p4 = Mwrist.times(Thand).times(vec4(1, 0, 0, 1));
-  return vec3(p4[0], p4[1], p4[2]);
-}
-
-
-
-	// Inside Articulated_Human class
-
-	// Helper to find the world-space matrix of a specific Arc (joint)
-	// get_arc_world_matrix(target_arc) {
-	// 	let world_matrix = Mat4.identity();
-
-	// 	// Recursive helper to traverse the tree and find the target arc
-	// 	const find_matrix = (current_arc, current_matrix) => {
-	// 		if (!current_arc) return null;
-
-	// 		const L = current_arc.location_matrix;
-	// 		const A = current_arc.articulation_matrix;
-	// 		// Apply this arc's transformations
-	// 		const new_matrix = current_matrix.times(L).times(A);
-
-	// 		if (current_arc === target_arc) {
-	// 			return new_matrix;
-	// 		}
-
-	// 		const node = current_arc.child_node;
-	// 		for (const next_arc of node.children_arcs) {
-	// 			const found = find_matrix(next_arc, new_matrix);
-	// 			if (found) return found;
-	// 		}
-	// 		return null;
-	// 	};
-
-	// 	return find_matrix(this.root, world_matrix);
-	// }
 
 	// Returns the world-space position of a joint
 	get_joint_world_pos(joint_arc) {
@@ -369,27 +308,12 @@ get_end_effector_position() {
 
 	// Returns the world-space direction of a local rotation axis (e.g., [1,0,0])
 	get_joint_world_axis(joint_arc, local_axis) {
-		// local_axis is a vec3 like vec3(1,0,0)
 		const m = this.get_arc_world_matrix(joint_arc);
-
-		// Transform direction by rotation part only (w=0 ignores translation)
 		const a4 = vec4(local_axis[0], local_axis[1], local_axis[2], 0);
 		const w4 = m.times(a4);
 
 		return vec3(w4[0], w4[1], w4[2]).normalized();
 	}
-
-
-	// Updated version of the end effector helper
-	// get_end_effector_position() {
-	// 	// We want the tip of the hand. 
-	// 	// In your constructor, r_hand_node has a pre_multiply(Mat4.translation(0.4, 0, 0))
-	// 	// and a scale(.4, .3, .2). The tip is roughly at local x = 0.8
-	// 	const world_matrix = this.get_arc_world_matrix(this.r_wrist);
-	// 	if (!world_matrix) return vec3(0,0,0);
-	// 	return world_matrix.times(Mat4.translation(0.8, 0, 0)).times(vec4(0, 0, 0, 1)).to3();
-	// }
-
 
 }
 
@@ -400,7 +324,7 @@ class Node {
 		this.shape = shape;
 		this.transform_matrix = transform;
 		this.children_arcs = [];
-    this.color_override = color_override; 
+		this.color_override = color_override; 
 	}
 }
 
@@ -503,17 +427,14 @@ class Polyline extends Shape {
 }
 
 // helper function 
-// Add this helper function outside the classes in assignment2.js
 function solve_linear_system(J, dx) {
 	// Damped least squares: dtheta = J^T (J J^T + λ^2 I)^-1 dx
 	const lambda = 0.1;
-
 	// Build J^T (N x 3)
 	const JT = [];
 	for (let i = 0; i < J[0].length; i++) {
 		JT[i] = [J[0][i], J[1][i], J[2][i]];
 	}
-
 	// Compute JJT = (3x3)
 	const JJT = [[0,0,0],[0,0,0],[0,0,0]];
 	for (let i = 0; i < 3; i++) {
@@ -523,8 +444,7 @@ function solve_linear_system(J, dx) {
 			JJT[i][j] = sum;
 		}
 	}
-
-	// Add damping λ^2 I
+	// Add damping
 	JJT[0][0] += lambda*lambda;
 	JJT[1][1] += lambda*lambda;
 	JJT[2][2] += lambda*lambda;
@@ -555,7 +475,6 @@ function solve_linear_system(J, dx) {
 		(JJT[0][0]*JJT[1][1] - JJT[0][1]*JJT[1][0]) * invDet
 		]
 	];
-
 		// temp = inv * dx  (3)
 		const temp = [0,0,0];
 		for (let i = 0; i < 3; i++) {
@@ -567,7 +486,6 @@ function solve_linear_system(J, dx) {
 		for (let i = 0; i < J[0].length; i++) {
 			dtheta[i] = JT[i][0]*temp[0] + JT[i][1]*temp[1] + JT[i][2]*temp[2];
 		}
-
 		return dtheta;
 }
 
@@ -585,11 +503,10 @@ class Assignment2_base extends Component
 	init()
 	{
 		console.log("init"); 
-		console.log("force update"); 
 
 
-			// constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
-			this.hover = this.swarm = false;
+		// constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
+		this.hover = this.swarm = false;
 		// At the beginning of our program, load one of each of these shape
 		// definitions onto the GPU.  NOTE:  Only do this ONCE per shape it
 		// would be redundant to tell it again.  You should just re-use the
@@ -615,14 +532,11 @@ class Assignment2_base extends Component
 		this.ball_radius = 0.25;
 
 		// TODO: you should create a Spline class instance
-
-		// Create a hardcoded Hermite spline and a polyline mesh for it.
+		// hardcoded spline + human instance
 		this.spline = new HermiteSpline();
 		this.human = new Articulated_Human(); 
-
-		// Control points + tangents for "8" (tangents are (dx,dy,0) in world coords)
 		// Figure-8 with smoother circular loops
-		const blackboard_z = -0.9; 
+		const blackboard_z = -0.9; // backboard is z = -1, with width 0.2, therefore -1 + 0.1 = -0.9, which is the front of blackboard.
 		this.spline.clear();
 
 		this.spline.add_point(vec3(-3.15 + 6.0,  0.146 + 6.0,  blackboard_z), vec3(-14.8,   8.442, 0));
@@ -633,20 +547,14 @@ class Assignment2_base extends Component
 		this.spline.add_point(vec3(-4.27 + 6.0, -1.08 + 6.0,   blackboard_z), vec3(1.08,  -13.14,  0));
 		this.spline.add_point(vec3(-3.065 + 6.0,-1.957 + 6.0,  blackboard_z), vec3(10.7,  -0.144,  0));
 		this.spline.add_point(vec3(-1.887 + 6.0,-1.082 + 6.0,  blackboard_z), vec3(-0.162, 14.15,  0));
+		this.spline.add_point(vec3(-3.15 + 6.0,  0.146 + 6.0,  blackboard_z), vec3(-14.8, 8.442, 0)); // closing point (same as first)
 
-		// Closing point (same as first)
-		this.spline.add_point(vec3(-3.15 + 6.0,  0.146 + 6.0,  blackboard_z), vec3(-14.8, 8.442, 0));
-
-
-
-		const spline_pts = this.spline.sample(400); // samples per segment
+		const spline_pts = this.spline.sample(400); // samples per segment (very high in order to make smooth circle)
 		this.shapes.spline = new Polyline(spline_pts);
 		this.draw_spline = (spline_pts.length > 1);
 
-
-
 		this.hand_reached_board = false; 
-		this.initial_target = vec3(3.0, 6.0, -0.9); // Adjust to match your blackboard position
+		this.initial_target = vec3(3.0, 6.0, blackboard_z); 
 		this.spline_u = 0.0; 
 		this.initial_target = this.spline.evaluate(this.spline_u); 
 		this.spline_speed = 0.1;
@@ -753,16 +661,13 @@ export class Assignment2 extends Assignment2_base
 		// TODO: you should draw scene here.
 		// TODO: you can change the wall and board as needed.
 
-		// --- ADD THIS IK LOGIC HERE ---
 		if (!this.hand_reached_board) {
 			// Phase 1: move to the board target
 			const end_pos = this.human.get_end_effector_position();
 			const distance = this.initial_target.minus(end_pos).norm();
 
-			//this.human.solve_ik(this.initial_target);
-
 			const target_on_spline = this.spline.evaluate(this.spline_u); 
-
+			// multiple iternations to keep end effector on spline
 			for (let iter = 0; iter < 15; iter++){
 				const e = target_on_spline.minus(this.human.get_end_effector_position().norm()); 
 				if (e <0.01) break; 
@@ -771,23 +676,16 @@ export class Assignment2 extends Assignment2_base
 
 			if (distance < 0.1) {
 				this.hand_reached_board = true;
-
-				// OPTIONAL: start tracing from the center point of the spline
-				// (center intersection is t=0 if you built it that way, otherwise just start at 0)
 				this.spline_u = 0.0;
 			}
 		} else {
 			// Phase 2: trace spline forever
 			const dt = this.uniforms.animation_delta_time / 1000; // seconds since last frame
-
 			// advance u, wrap into [0,1)
 			this.spline_u = (this.spline_u + this.spline_speed * dt) % 1.0;
-
 			// evaluate spline at u
 			const target_on_spline = this.spline.evaluate(this.spline_u);
-
-			// move hand toward that moving target
-			// this.human.solve_ik(target_on_spline);
+			// multiple iterations to ensure hand is kept on target
 			for (let i = 0; i < 10; i++){ 
 				this.human.solve_ik(target_on_spline);
 
@@ -796,7 +694,6 @@ export class Assignment2 extends Assignment2_base
 				if (dist < 0.001) break;
 			}
 		}
-		// ------------------------------
 
 		this.human.draw(caller, this.uniforms, this.materials.plastic);  
 		let wall_transform = Mat4.translation(0, 5, -1.2).times(Mat4.scale(6, 5, 0.1));
