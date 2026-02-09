@@ -585,6 +585,7 @@ class Assignment2_base extends Component
 	init()
 	{
 		console.log("init"); 
+		console.log("force update"); 
 
 
 			// constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
