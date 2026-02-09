@@ -202,7 +202,7 @@ class Articulated_Human {
 		}
 	}
 
-	solve_ik(target_pos) {
+	solve_ik(target_pos, current_gain = 0.5) {
 		// Joints in order
 		const joints = [this.r_shoulder, this.r_elbow, this.r_wrist];
 		// Per-spec DOFs:
@@ -242,7 +242,7 @@ class Articulated_Human {
 		const dtheta = solve_linear_system(J, [dx_vec[0], dx_vec[1], dx_vec[2]]);
 
 		// Apply with a small gain for stability
-		const gain = 0.5; // 0.025
+		const gain = current_gain; // 0.025
 		let k = 0;
 		// shoulder: x,y,z
 		{
@@ -664,20 +664,29 @@ export class Assignment2 extends Assignment2_base
 		if (!this.hand_reached_board) {
 			// Phase 1: move to the board target
 			const end_pos = this.human.get_end_effector_position();
-			const distance = this.initial_target.minus(end_pos).norm();
 
-			const target_on_spline = this.spline.evaluate(this.spline_u); 
-			// multiple iternations to keep end effector on spline
-			for (let iter = 0; iter < 15; iter++){
-				const e = target_on_spline.minus(this.human.get_end_effector_position().norm()); 
-				if (e <0.01) break; 
-				this.human.solve_ik(target_on_spline); 
+			const target = this.initial_target; 
+
+			const distance = target.minus(end_pos).norm(); 
+			this.human.solve_ik(target, 0.02); 
+			if (distance < 0.1){
+				this.hand_reached_board = true; 
+				this.spline_u = 0.0; 
 			}
 
-			if (distance < 0.1) {
-				this.hand_reached_board = true;
-				this.spline_u = 0.0;
-			}
+			//const distance = this.initial_target.minus(end_pos).norm();
+			// const target_on_spline = this.spline.evaluate(this.spline_u); 
+			// // multiple iternations to keep end effector on spline
+			// for (let iter = 0; iter < 15; iter++){
+			// 	const e = target_on_spline.minus(this.human.get_end_effector_position().norm()); 
+			// 	if (e <0.01) break; 
+			// 	this.human.solve_ik(target_on_spline); 
+			// }
+
+			// if (distance < 0.1) {
+			// 	this.hand_reached_board = true;
+			// 	this.spline_u = 0.0;
+			// }
 		} else {
 			// Phase 2: trace spline forever
 			const dt = this.uniforms.animation_delta_time / 1000; // seconds since last frame
@@ -687,7 +696,7 @@ export class Assignment2 extends Assignment2_base
 			const target_on_spline = this.spline.evaluate(this.spline_u);
 			// multiple iterations to ensure hand is kept on target
 			for (let i = 0; i < 10; i++){ 
-				this.human.solve_ik(target_on_spline);
+				this.human.solve_ik(target_on_spline, 0.5);
 
 				const current_pos = this.human.get_end_effector_position();
 				const dist = current_pos.minus(target_on_spline).norm();
