@@ -426,7 +426,7 @@ class Polyline extends Shape {
 	}
 }
 
-// helper function 
+// helper function, for the jacobian
 function solve_linear_system(J, dx) {
 	// Damped least squares: dtheta = J^T (J J^T + λ^2 I)^-1 dx
 	const lambda = 0.1;
@@ -673,20 +673,6 @@ export class Assignment2 extends Assignment2_base
 				this.hand_reached_board = true; 
 				this.spline_u = 0.0; 
 			}
-
-			//const distance = this.initial_target.minus(end_pos).norm();
-			// const target_on_spline = this.spline.evaluate(this.spline_u); 
-			// // multiple iternations to keep end effector on spline
-			// for (let iter = 0; iter < 15; iter++){
-			// 	const e = target_on_spline.minus(this.human.get_end_effector_position().norm()); 
-			// 	if (e <0.01) break; 
-			// 	this.human.solve_ik(target_on_spline); 
-			// }
-
-			// if (distance < 0.1) {
-			// 	this.hand_reached_board = true;
-			// 	this.spline_u = 0.0;
-			// }
 		} else {
 			// Phase 2: trace spline forever
 			const dt = this.uniforms.animation_delta_time / 1000; // seconds since last frame
