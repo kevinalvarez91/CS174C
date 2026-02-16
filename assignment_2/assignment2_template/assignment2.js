@@ -185,9 +185,9 @@ class Articulated_Human {
 		// Joints in order
 		const joints = [this.r_shoulder, this.r_elbow, this.r_wrist];
 		// Per-spec DOFs:
-		// shoulder: x,y,z  (3)
-		// elbow:    x,y    (2)
-		// wrist:    y,z    (2)
+		// shoulder: x,y,z (3)
+		// elbow: x,y (2)
+		// wrist: y,z (2)
 		const axes_by_joint = new Map([
 				[this.r_shoulder, [vec3(1,0,0), vec3(0,1,0), vec3(0,0,1)]],
 				[this.r_elbow,    [vec3(1,0,0), vec3(0,1,0)]],
@@ -279,13 +279,13 @@ class Articulated_Human {
 	}
 
 
-	// Returns the world-space position of a joint
+	// returns the world-space position of a joint
 	get_joint_world_pos(joint_arc) {
 		const m = this.get_arc_world_matrix(joint_arc);
 		return m.times(vec4(0, 0, 0, 1)).to3();
 	}
 
-	// Returns the world-space direction of a local rotation axis (e.g., [1,0,0])
+	// returns the world-space direction of a local rotation axis (e.g., [1,0,0])
 	get_joint_world_axis(joint_arc, local_axis) {
 		const m = this.get_arc_world_matrix(joint_arc);
 		const a4 = vec4(local_axis[0], local_axis[1], local_axis[2], 0);
@@ -628,7 +628,7 @@ export class Assignment2 extends Assignment2_base
 		this.shapes.box.draw( caller, this.uniforms, floor_transform, { ...this.materials.plastic, color: yellow } );
 
 
-		// Draw the hardcoded spline as a red polyline (static).
+		// Draw the hardcoded spline as a red polyline (static)
 		if (this.draw_spline && this.shapes.spline && this.shapes.spline.indices.length > 1) {
 			this.shapes.spline.draw(
 					caller,
@@ -662,7 +662,6 @@ export class Assignment2 extends Assignment2_base
 			// multiple iterations to ensure hand is kept on target
 			for (let i = 0; i < 10; i++){ 
 				this.human.solve_ik(target_on_spline, 0.5);
-
 				const current_pos = this.human.get_end_effector_position();
 				const dist = current_pos.minus(target_on_spline).norm();
 				if (dist < 0.001) break;

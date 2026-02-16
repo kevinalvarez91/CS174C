@@ -1,0 +1,78 @@
+CS 169C Midterm Review
+
+Keyframing: An important pose or frame
+	-> Character arm at rest
+	-> Arm halfway raised
+	-> Arm fully raised
+	
+Interpolation: Compute smooth transitions between keyframes
+	-> Not all interpolation has the same effect
+	   -> Linear interpolation: Constant speed, but can be jerky and robotic
+	   -> Spline interpolation: More natual motion
+	   -> Physics interpolation: The most natural approach
+
+Vision:
+	-> Foveal: Exactly where you are looking
+	-> Peripheral: Around the direction point you are looking at
+
+Motion Blur: In Reality our eyes can not handle quick transitions. So our eyes have motion blur for fast moving objects.
+       -> Without motion blur, the motion can become choppy or discontinous if the refresh rate is not high enough.
+       -> If there isn't studdering (i.e already looks smooth), then no need to add motion blur, only needed to be added
+       when frame rate is very low, motion is very fast, or movement looks discontinous/studdery.
+
+Squash and Stretch:
+       -> Rigid objects look robotic, so let object deform to make the motion more natural and fluid.
+       -> Perseve volume, if you squash one axis, you need to expand the other axis. E.g a tennis ball hitting a wall.
+       -> This is often over done, compared to real life to better serve the animation.
+
+Timing:
+	-> How something moves, defines its weight and mood to the audience.
+	-> I.e how fast it moves, and how long an action takes.
+
+Anticipation:
+	-> The preperation before a motion.
+	-> It indicates how much effort a character is making, and helps control the audience's attention. Signals something is about
+	to happen, and where it is going to happen.
+
+Staging:
+	-> Simply making the action clear, avoid confusing the audience by having more than one thing going on in a scene.
+	-> Select a camera view point and pose the character in a manner that ensures you visually can't mistake what is going on
+
+Follow-Through and Secondary Motion:
+	       -> Physics demands follow-through the inertia that is carried through after an action.
+	       -> For example knees bending after landing a jump, also helps define weight rigidity.
+	       -> Secondary motion is motion that is not part of the main action, but is physically necessary to support it.
+	       	  -> Like arms swinging as your jumping
+
+Overlapping action and Asymmetry:
+	    -> Start the next action before the current one finishes, if you don't do this then it looks scripted and robotic
+	    -> Humans are very good at spotting synchronization, and natural motion is rarely the exact same on both sides of the
+	    body, therefore break it up by introducing asymmetries in the motion
+
+Slow in and Out:
+     -> Objects accelerate and decelerate smoothly instead of instantly changing speed. Just how quickly it accelerates or deaccelerates
+     helps define mood, weiight...
+
+Arcs:
+	-> Natural motion tends not to be in straight lines, instead we should be interpolating motion along arcs.
+
+Exaggeration:
+	-> If too subtle, even if it is accurate the audience will mis it, which makes animation confusing and boring.
+	-> Don't worry about being physically accurate, we only care about coveying the psychological impression as effectively as possible.
+
+Appeal:
+	-> Make animations that people enjoying watching, appealing characters aren't necessarily attractive, just well designed and rendered
+
+Straight Ahead Vs Pose-to-Pose:
+	 -> Straight ahead means making one frame after the other, this works well for rapid unpredicatble motion
+	 -> Pose-to-Pose means planning it out, then making keyframes, and then interpolating inbetween keyframes later.
+
+Extremes:
+	-> This is another definition of Keyframes. They usually define the extremem positions of a character.
+	-> The frames inbetween introduce relatively little new. 
+
+Layering:
+	-> Work out the big picture first, i.e where charatcers need to be and when.
+	-> Then figure out the smaller stuff, like which way the characters face moves, their limbs move, their fingers and face, then working on clothing and hair..
+
+
